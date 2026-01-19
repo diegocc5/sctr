@@ -1,3 +1,16 @@
+/*
+ * Proyecto SCTR : Control Automático de Iluminación ambiental mediante Raspberry Pi y sensor LDR
+ *
+ * Autores: Yago Andrés Martínez, Brais Ansede González, Andrea Caeiro Almeida y Diego Costas Méndez.
+ *
+ * Comportamiento:
+ * APAGADO → ENCENDIDO con 'LUMINOSO'; APAGADO → PARPADEO con 'TENUE';
+ * PARPADEO → ENCENDIDO con 'LUMINOSO'; PARPADEO → APAGADO con 'OSCURO';
+ * ENCENDIDO → PARPADEO con 'TENUE'; ENCENDIDO → APAGADO con 'OSCURO';
+ * El resto de combinaciones quedan como NULL y se validan antes de llamar.
+ *
+ */
+
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
@@ -117,144 +130,170 @@ float ina219_read_current_mA(void)
      * del valor de calibración configurado previamente. */
 }
 
-/* Lee el voltaje del bus y lo devuelve en voltios. */
-float ina219_read_bus_voltage_V(void) 
-{
-    /* Lectura cruda del registro de voltaje del bus. */
-    int16_t raw = ina219_read_register(INA219_REG_BUS_VOLTAGE);
-    
-    
-    /* El registro usa los bits [15:3]
-     * Cada LSB equivale a 4 mV. */
-    return ((raw >> 3) * 4) / 1000.0f;
+/* ------------------------------------------------------------
+ * MÁQUINA DE ESTADOS (LÓGICA)
+ * ------------------------------------------------------------ */
+
+/* Enum para los estados del led, este tendrá los valores de APAGADO,
+ * PARPADEO y ENCENDIDO. Se añade STATE_MAX para su uso más adelante para dimensionar 
+ * tablas. */
+enum state {
+    APAGADO = 0,
+    PARPADEO,
+    ENCENDIDO,
+    STATE_MAX
+};
+
+/* Enum para los eventos de transición del led, estos serán OSCURO,
+ * TENUE y LUMINOSO. Se añade el evento por defecto NONE y EVENT_MAX para su uso
+ * más adelante para dimensionar. */
+enum event {
+    NONE = 0,
+    OSCURO,
+    TENUE,
+    LUMINOSO,
+    EVENT_MAX
+};
+
+/* Funciones para mostrar en consola el estado del led. */
+void oscuridad(void){
+    printf("LED: APAGADO.\n");
+}
+void poca_luz(void){
+    printf("LED: TENUE (PARPADEO).\n");
+}
+void luz(void){
+    printf("LED: ENCENDIDO.\n");
 }
 
-
-/* enumerando de estados */
-enum state {
-	APAGADO = 0,
-	PARPADEO,
-	ENCENDIDO,
-	STATE_MAX
-};
-/* enumerando de eventos */
-enum event {
-	NONE = 0,
-	OSCURO,
-	TENUE,
-	LUMINOSO,
-	EVENT_MAX
-};
-/* acciones */
-void oscuridad(void){
-	printf("sin luz")
-};
-void poca_luz(void){
-	printf("poca luz")
-};
-void luz(void){
-	printf("luz")
-};
-
-/* transiciones */
+/* Funciones de tipo enum state para devolver un valor de estado. */
 enum state oscuro_pocaluz(void)
 {
-	poca_luz();
-	return PARPADEO;
+    poca_luz();
+    return PARPADEO;
 }
 enum state oscuro_luz(void)
 {
-	luz();
-	return ENCENDIDO;
+    luz();
+    return ENCENDIDO;
 }
 enum state pocaluz_luz(void)
 {
-	luz();
-	return ENCENDIDO;
+    luz();
+    return ENCENDIDO;
 }
 enum state pocaluz_oscuro(void)
 {
-	oscuridad();
-	return APAGADO;
+    oscuridad();
+    return APAGADO;
 }
 enum state luz_pocaluz(void)
 {
-	poca_luz();
-	return PARPADEO;
+    poca_luz();
+    return PARPADEO;
 }
 enum state luz_oscuro(void)
 {
-	oscuridad();
-	return APAGADO;
+    oscuridad();
+    return APAGADO;
 }
-/* tabla de transiciones */
-enum state (*trans_table[STATE_MAX][EVENT_MAX])(void) = {
-	[APAGADO] = {
-		[TENUE] = oscuro_pocaluz,
-		[LUMINOSO] = oscuro_luz,
-	},
-	[PARPADEO] = {
-		[OSCURO] = pocaluz_oscuro,
-		[LUMINOSO] = pocaluz_luz
-	}
-	[ENCENDIDO] = {
-		[TENUE] = luz_pocaluz,
-		[OSCURO] = luz_oscuro
-	}
 
+/* Enum state para crear la Tabla de Transiciones que, a partir del estado actual 
+ * y del evento recibido, permite determinar y ejecutar la función de transición 
+ * correspondiente. */
+enum state (*trans_table[STATE_MAX][EVENT_MAX])(void) = {
+    [APAGADO] = {
+        [TENUE] = oscuro_pocaluz,
+        [LUMINOSO] = oscuro_luz,
+    },
+    [PARPADEO] = {
+        [OSCURO] = pocaluz_oscuro,
+        [LUMINOSO] = pocaluz_luz
+    },
+    [ENCENDIDO] = {
+        [TENUE] = luz_pocaluz,
+        [OSCURO] = luz_oscuro
+    }
 };
 
-/*parseador de eventos se le mete intensidad y se compara 
-con valores para oscuro, tenue y luminoso*/
-
-enum event event_parser(float intensidad)                     <------------- AVERIGUAR VALORES TENUE OSCURO LUMINOSO
+/* El parser de eventos convierte el valor leído por el sensor de luz 
+ * en eventos que la máquina de estados utiliza para decidir la acción 
+ * sobre el LED. */
+enum event event_parser(float intensidad)
 {
-	
-	if (intensidad < 0.0066){
-		if ( intensidad > 0.00033){
-			return TENUE;}
-		else return OSCURO;}
+    if (intensidad < 0.0066){
+        if ( intensidad > 0.00033){
+            return TENUE;}
+        else return OSCURO;}
 
-	if (intensidad >= 0.0066){
-		return LUMINOSO;}
-	
-
-	return NONE;
+    if (intensidad >= 0.0066){
+        return LUMINOSO;}
+    
+    return NONE;
 }
+
+/* ------------------------------------------------------------
+ * FUNCIÓN PRINCIPAL
+ * ------------------------------------------------------------ */
+
 int main(void)
 {
+    /* Inicializa los sistemas de entrada/salida estándar. */
+    stdio_init_all();
 
-	stdio_init_all();
+    /* Inicialización del bus I2C:
+     * - Se configura la velocidad a 100 kHz
+     * - Se asignan las funciones I2C a los pines SDA y SCL
+     * - Se habilitan las resistencias pull-up necesarias para el bus. */
+    i2c_init(I2C_PORT, 100 * 1000);
+    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C_SDA);
+    gpio_pull_up(I2C_SCL);
 
-    	/* Inicializar I2C */
-    	i2c_init(I2C_PORT, 100 * 1000);
-    	gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    	gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    	gpio_pull_up(I2C_SDA);
-    	gpio_pull_up(I2C_SCL);
+    /* Retardo para asegurar inicialización. */
+    sleep_ms(100);
 
-    	sleep_ms(100);
+    /* Inicializa el sensor INA219 de corriente y voltaje. */
+    ina219_init();
 
-   	ina219_init();
+    /*Estado inicial, LED apagado. */
+    oscuridad();
+    /* Corrección: El estado inicial de la variable debe coincidir con la lógica */
+    enum state st = APAGADO; 
 
-	printf("oscuro");
-	oscuridad();
-	enum state st = OSCURO;
+    /* Bucle for infinito para comprobar constantemente el estado del sensor de luminosidad
+     * y ejecutar los consiguientes cambios en el led. */
+    for (;;) {
 
-	for (;;) {
-		float intensidad = ina219_read_current_mA();                         <-------- FUNCION SACA INTENSIDAD DEL SENSOR
-		if (intensidad == EOF) { break; }                                    <--------- son necesarias estras dos lineas?¿?¿
-		if (intensidad == '\n' || ch == '\r') { continue; }
+        /* Variable donde se guarda el valor obtenido de intensidad lumínica por el sensor. */
+        float intensidad = ina219_read_current_mA();
 
-		enum event ev = event_parser(instensidad);
-		enum state (*tr)(void) = trans_table[st][ev];
-		if (tr == NULL) { 
-			printf("Transicion no definida (st=%d, ev=%d)\n", st, ev);
-			continue;
-		}
-		st = tr(); 
-	}
+        /* Convertir la entrada de valor de luminosidad en un evento de la FSM. */
+        enum event ev = event_parser(intensidad);
+        
+        /* Validación de evento nulo antes de buscar en tabla */
+        if (ev == NONE) {
+             sleep_ms(100);
+             continue;
+        }
 
-	return 0;
+        /* Se busca la transición válida para el estado actual y el evento producido.
+         * - Transición existente: tr apunta a una función.
+         * - Transición no existente: tr será NULL.         
+         */
+        enum state (*tr)(void) = trans_table[st][ev];
+        
+        if (tr == NULL) { 
+            /* Transición no válida, se mantiene estado */
+        } else {
+             /* Se ejecuta la acción de transición y se actualiza el estado. */
+            st = tr(); 
+        }
+        
+        /* Pequeño retardo para estabilidad */
+        sleep_ms(500);
+    }
+
+    return 0;
 }
-
