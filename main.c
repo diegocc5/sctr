@@ -74,6 +74,7 @@ enum event {
 /* Funciones para el estado del led. */
 void oscuridad(void){
     gpio_put(LED_PIN, 1); // encender LED físico
+    cancel_repeating_timer(&timer);
 }
 
 void poca_luz(void){
@@ -83,6 +84,7 @@ void poca_luz(void){
 
 void luz(void){
     gpio_put(LED_PIN, 0); // apagar LED físico
+    cancel_repeating_timer(&timer);
 }
 
 void print_adc_voltage(float voltaje){
