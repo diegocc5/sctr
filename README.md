@@ -24,7 +24,7 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 ## Instrucciones de Conexión con la placa para lectura de datos del sensor LDR
 1. Ejecutar como administrador la consola Powershell de Windows.
 2. Conectar la placa con el programa ya guardado archivo `.uf2` SIN pulsar el botón.
-3. Introducir el comando `usbipd list` y anotar el <BUSID>
+3. Introducir el comando `usbipd list` y anotar el `<BUSID>`.
 4. Introducir los comandos:
    `usbipd bind --busid <BUSID>`
    `usbipd attach --wsl --busid <BUSID>`
