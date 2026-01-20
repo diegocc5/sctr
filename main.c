@@ -14,6 +14,21 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
+#include "pico/time.h"
+
+
+/* ------------------------------------------------------------
+ * FUNCION BLINK LED
+ * ------------------------------------------------------------ */
+struct repeating_timer timer;
+bool blink_callback(struct repeating_timer *t) {
+    static bool state = false;
+    gpio_put(LED_PIN, state);
+    state = !state;
+    return true;
+}
+
+
 /* ------------------------------------------------------------
  * CONFIGURACIÓN HARDWARE
  * ------------------------------------------------------------ */
@@ -36,6 +51,8 @@ const float CONVERSION_FACTOR = 3.3f / (1 << 12);
 /* Enum para los estados del led, este tendrá los valores de APAGADO,
  * PARPADEO y ENCENDIDO. Se añade STATE_MAX para su uso más adelante para dimensionar 
  * tablas. */
+
+
 enum state {
     APAGADO = 0,
     PARPADEO,
@@ -60,9 +77,8 @@ void oscuridad(void){
 }
 
 void poca_luz(void){
-    /* Simulación de parpadeo rápido  ESTO PARPADEA 1 VEZ?¿¿ */   
-    gpio_put(LED_PIN, 1); sleep_ms(100);
-    gpio_put(LED_PIN, 0); sleep_ms(100);
+    add_repeating_timer_ms(500, blink_callback, NULL, &timer);
+   
 }
 
 void luz(void){
@@ -154,9 +170,7 @@ int main(void)
     adc_init();
     adc_gpio_init(ADC_PIN); // Prepara el pin GP26 para leer analógico
     adc_select_input(ADC_CHANNEL); // Selecciona el canal 0
-
-
-
+    
     /* Retardo para asegurar inicialización. */
     sleep_ms(100);
 
