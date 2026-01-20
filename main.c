@@ -155,17 +155,24 @@ enum event {
     EVENT_MAX
 };
 
-/* Funciones para mostrar en consola el estado del led. */
+/* Funciones para el estado del led. */
 void oscuridad(void){
     gpio_put(2, 0);
     sleep_ms(500);
 }
 void poca_luz(void){
-    printf("LED: TENUE (PARPADEO).\n");
+    blink_led_forever(2,100);
+    
 }
 void luz(void){
     gpio_put(2, 1);
     sleep_ms(500);
+}
+void blink_led_forever(uint pin, uint period_ms) {
+    while (true) {
+        gpio_put(pin, !gpio_get(pin));
+        sleep_ms(period_ms);
+    }
 }
 
 /* Funciones de tipo enum state para devolver un valor de estado. */
