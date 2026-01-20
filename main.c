@@ -161,7 +161,7 @@ void oscuridad(void){
     sleep_ms(500);
 }
 void poca_luz(void){
-    blink_led_forever(2,100);
+    /* blink_led_forever(2,100);*/
     
 }
 void luz(void){
