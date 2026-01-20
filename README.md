@@ -21,7 +21,7 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 4. Compilar: `make`
 5. Arrastrar el archivo `.uf2` a la Raspberry Pi Pico.
 
-## Instrucciones de Conexión con la placa para lectura de datos del sensor LDR
+## (Opcional) Instrucciones de Conexión con la placa para lectura de datos del ADC por consola
 1. Ejecutar como administrador la consola Powershell de Windows.
 2. Introducir el comando `usbipd list` y anotar el `<BUSID>` del dispositivo serie usb (COM3).
 3. Introducir los comandos:
