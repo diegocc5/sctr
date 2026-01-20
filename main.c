@@ -221,12 +221,12 @@ enum state (*trans_table[STATE_MAX][EVENT_MAX])(void) = {
  * sobre el LED. */
 enum event event_parser(float intensidad)
 {
-    if (intensidad < 0.0066){
-        if ( intensidad > 0.00033){
+    if (intensidad < 6.6){
+        if ( intensidad > 0.33){
             return TENUE;}
         else return OSCURO;}
 
-    if (intensidad >= 0.0066){
+    if (intensidad >= 6.6){
         return LUMINOSO;}
     
     return NONE;
