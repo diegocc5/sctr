@@ -10,7 +10,7 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 * **Diego Costas Méndez:**
 
 ## Esquema del Circuito
-*
+*![Esquema del Circuito](image.extensión)
 *
 > El sistema conecta el sensor INA219 mediante I2C (Pines GP0 y GP1).
 
