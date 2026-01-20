@@ -69,6 +69,9 @@ void luz(void){
     gpio_put(LED_PIN, 0); // apagar LED físico
 }
 
+void print_adc_voltage(float voltaje){
+    printf("Voltaje LDR: %.2f V\n", voltaje);
+}
 
 /* Funciones de tipo enum state para devolver un valor de estado. */
 enum state oscuro_pocaluz(void)
@@ -174,6 +177,9 @@ int main(void)
 
          /* Convertir a Voltaje (0.0V - 3.3V) */
         float voltaje = raw_value * CONVERSION_FACTOR;
+
+        // Imprimir en consola
+        print_adc_voltage(voltaje);
 
         /* Convertir la entrada de valor de luminosidad en un evento de la FSM. */
         enum event ev = event_parser(voltaje);
