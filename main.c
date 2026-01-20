@@ -13,6 +13,20 @@
 
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "hardware/adc.h"
+/* ------------------------------------------------------------
+ * CONFIGURACIÓN HARDWARE
+ * ------------------------------------------------------------ */
+
+/* Pin del LED (Actuador) */
+#define LED_PIN 2
+
+/* Pin del Sensor (Entrada Analógica) */
+#define ADC_PIN 26      // GP26 corresponde al canal ADC 0
+#define ADC_CHANNEL 0
+
+/* Factor de conversión: 3.3V / 4095 (12 bits) */
+const float CONVERSION_FACTOR = 3.3f / (1 << 12);
 
 
 /* ------------------------------------------------------------
@@ -42,23 +56,19 @@ enum event {
 
 /* Funciones para el estado del led. */
 void oscuridad(void){
-    gpio_put(2, 0);
-    sleep_ms(500);
+    gpio_put(LED_PIN, 0); // Apagar LED físico
 }
+
 void poca_luz(void){
-    /* blink_led_forever(2,100);*/
-    
+    /* Simulación de parpadeo rápido  ESTO PARPADEA 1 VEZ?¿¿ */   
+    gpio_put(LED_PIN, 1); sleep_ms(100);
+    gpio_put(LED_PIN, 0); sleep_ms(100);
 }
+
 void luz(void){
-    gpio_put(2, 1);
-    sleep_ms(500);
+    gpio_put(LED_PIN, 1); // Encender LED físico
 }
-void blink_led_forever(uint pin, uint period_ms) {
-    while (true) {
-        gpio_put(pin, !gpio_get(pin));
-        sleep_ms(period_ms);
-    }
-}
+
 
 /* Funciones de tipo enum state para devolver un valor de estado. */
 enum state oscuro_pocaluz(void)
@@ -113,15 +123,16 @@ enum state (*trans_table[STATE_MAX][EVENT_MAX])(void) = {
 /* El parser de eventos convierte el valor leído por el sensor de luz 
  * en eventos que la máquina de estados utiliza para decidir la acción 
  * sobre el LED. */
-enum event event_parser(float intensidad)
+enum event event_parser(float tension)
 {
-    if (intensidad < 6.6){
-        if ( intensidad > 0.33){
-            return TENUE;}
-        else return OSCURO;}
+    if (voltaje < 1.0f) {
+        return OSCURO;
+    } else if (voltaje >= 1.0f && voltaje < 2.5f) {
+        return TENUE;
+    } else {
+        return LUMINOSO;
+    }
 
-    if (intensidad >= 6.6){
-        return LUMINOSO;}
 
     return NONE;
 }
@@ -134,23 +145,20 @@ int main(void)
 {
     /* Inicializa los sistemas de entrada/salida estándar. */
     stdio_init_all();
-    gpio_init(2);
-    gpio_set_dir(2, GPIO_OUT);
-    /* Inicialización del bus I2C:
-     * - Se configura la velocidad a 100 kHz
-     * - Se asignan las funciones I2C a los pines SDA y SCL
-     * - Se habilitan las resistencias pull-up necesarias para el bus. */
-    i2c_init(I2C_PORT, 100 * 1000);
-    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    gpio_pull_up(I2C_SDA);
-    gpio_pull_up(I2C_SCL);
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
+
+    adc_init();
+    adc_gpio_init(ADC_PIN); // Prepara el pin GP26 para leer analógico
+    adc_select_input(ADC_CHANNEL); // Selecciona el canal 0
+
+
 
     /* Retardo para asegurar inicialización. */
     sleep_ms(100);
 
-    /* Inicializa el sensor INA219 de corriente y voltaje. */
-    ina219_init();
+    
+    
 
     /*Estado inicial, LED apagado. */
     oscuridad();
@@ -161,11 +169,14 @@ int main(void)
      * y ejecutar los consiguientes cambios en el led. */
     for (;;) {
 
-        /* Variable donde se guarda el valor obtenido de intensidad lumínica por el sensor. */
-        float intensidad = ina219_read_current_mA();
+        /* Leer el valor crudo del ADC (0-4095) */
+        uint16_t raw_value = adc_read();
+
+         /* Convertir a Voltaje (0.0V - 3.3V) */
+        float voltaje = raw_value * CONVERSION_FACTOR;
 
         /* Convertir la entrada de valor de luminosidad en un evento de la FSM. */
-        enum event ev = event_parser(intensidad);
+        enum event ev = event_parser(voltaje);
 
         /* Validación de evento nulo antes de buscar en tabla */
         if (ev == NONE) {
