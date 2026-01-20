@@ -120,7 +120,7 @@ float ina219_read_current_mA(void)
 {
     /* Lectura cruda del registro de corriente. */
     int16_t raw = ina219_read_register(INA219_REG_CURRENT);
-    
+
     /* Conversión a miliamperios:
      * se asume un LSB típico de 0.1 mA tras la calibración */
     return raw * 0.1f;
@@ -155,30 +155,48 @@ enum event {
     EVENT_MAX
 };
 
+/* Funciones para mostrar en consola el estado del led. */
+void oscuridad(void){
+    gpio_put(2, 0);
+    sleep_ms(500);
+}
+void poca_luz(void){
+    printf("LED: TENUE (PARPADEO).\n");
+}
+void luz(void){
+    gpio_put(2, 1);
+    sleep_ms(500);
+}
 
 /* Funciones de tipo enum state para devolver un valor de estado. */
 enum state oscuro_pocaluz(void)
 {
+    poca_luz();
     return PARPADEO;
 }
 enum state oscuro_luz(void)
 {
+    luz();
     return ENCENDIDO;
 }
 enum state pocaluz_luz(void)
 {
+    luz();
     return ENCENDIDO;
 }
 enum state pocaluz_oscuro(void)
 {
+    oscuridad();
     return APAGADO;
 }
 enum state luz_pocaluz(void)
 {
+    poca_luz();
     return PARPADEO;
 }
 enum state luz_oscuro(void)
 {
+    oscuridad();
     return APAGADO;
 }
 
@@ -212,7 +230,7 @@ enum event event_parser(float intensidad)
 
     if (intensidad >= 6.6){
         return LUMINOSO;}
-    
+
     return NONE;
 }
 
@@ -224,7 +242,8 @@ int main(void)
 {
     /* Inicializa los sistemas de entrada/salida estándar. */
     stdio_init_all();
-
+    gpio_init(2);
+    gpio_set_dir(2, GPIO_OUT);
     /* Inicialización del bus I2C:
      * - Se configura la velocidad a 100 kHz
      * - Se asignan las funciones I2C a los pines SDA y SCL
@@ -255,7 +274,7 @@ int main(void)
 
         /* Convertir la entrada de valor de luminosidad en un evento de la FSM. */
         enum event ev = event_parser(intensidad);
-        
+
         /* Validación de evento nulo antes de buscar en tabla */
         if (ev == NONE) {
              sleep_ms(100);
@@ -267,14 +286,14 @@ int main(void)
          * - Transición no existente: tr será NULL.         
          */
         enum state (*tr)(void) = trans_table[st][ev];
-        
+
         if (tr == NULL) { 
             /* Transición no válida, se mantiene estado */
         } else {
              /* Se ejecuta la acción de transición y se actualiza el estado. */
             st = tr(); 
         }
-        
+
         /* Pequeño retardo para estabilidad */
         sleep_ms(500);
     }
