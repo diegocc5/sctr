@@ -23,8 +23,8 @@
 #define I2C_PORT i2c0
 
 /* Pines GPIO asignados al bus I2C. */
-#define I2C_SDA  0
-#define I2C_SCL  1
+#define I2C_SDA  5
+#define I2C_SCL  6
 
 /* Dirección I2C del sensor INA219. */
 #define INA219_ADDR 0x40
