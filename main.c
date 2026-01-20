@@ -130,7 +130,7 @@ enum event event_parser(float voltaje)
 {
     if (voltaje < 1.0f) {
         return OSCURO;
-    } else if (voltaje >= 1.0f && voltaje < 2.5f) {
+    } else if (voltaje >= 1.0f && voltaje < 2.0f) {
         return TENUE;
     } else {
         return LUMINOSO;
