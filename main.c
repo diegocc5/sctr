@@ -16,10 +16,6 @@
 #include "hardware/adc.h"
 #include "pico/time.h"
 
-
-
-
-
 /* ------------------------------------------------------------
  * CONFIGURACIÓN HARDWARE
  * ------------------------------------------------------------ */
@@ -31,7 +27,7 @@
 #define ADC_PIN 26      // GP26 corresponde al canal ADC 0
 #define ADC_CHANNEL 0
 
-/* Factor de conversión: 3.3V / 4095 (12 bits) */
+/* Factor de conversión del ADC: 3.3V / 4095 (12 bits) */
 const float CONVERSION_FACTOR = 3.3f / (1 << 12);
 
 /* ------------------------------------------------------------
@@ -44,6 +40,7 @@ bool blink_callback(struct repeating_timer *t) {
     state = !state;
     return true;
 }
+
 /* ------------------------------------------------------------
  * MÁQUINA DE ESTADOS (LÓGICA)
  * ------------------------------------------------------------ */
@@ -51,8 +48,6 @@ bool blink_callback(struct repeating_timer *t) {
 /* Enum para los estados del led, este tendrá los valores de APAGADO,
  * PARPADEO y ENCENDIDO. Se añade STATE_MAX para su uso más adelante para dimensionar 
  * tablas. */
-
-
 enum state {
     APAGADO = 0,
     PARPADEO,
@@ -153,8 +148,6 @@ enum event event_parser(float voltaje)
     } else {
         return LUMINOSO;
     }
-
-
     return NONE;
 }
 
@@ -175,9 +168,6 @@ int main(void)
     
     /* Retardo para asegurar inicialización. */
     sleep_ms(100);
-
-    
-    
 
     /*Estado inicial, LED apagado. */
     oscuridad();
