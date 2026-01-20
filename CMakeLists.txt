@@ -13,7 +13,7 @@ pico_sdk_init()
 # Crea el ejecutable a partir del código fuente
 add_executable(sctr_app main.c)
 
-# Habilitar salida USB para los printf
+# Habilitar salida USB y habilitar salida UART ???
 pico_enable_stdio_usb(sctr_app 1)
 pico_enable_stdio_uart(sctr_app 1)
 
