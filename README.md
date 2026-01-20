@@ -23,10 +23,9 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 
 ## Instrucciones de Conexión con la placa para lectura de datos del sensor LDR
 1. Ejecutar como administrador la consola Powershell de Windows.
-2. Conectar la placa con el programa ya guardado archivo `.uf2` SIN pulsar el botón.
-3. Introducir el comando `usbipd list` y anotar el `<BUSID>`.
-4. Introducir los comandos:
+2. Introducir el comando `usbipd list` y anotar el `<BUSID>` del dispositivo serie usb (COM3).
+3. Introducir los comandos:
    `usbipd bind --busid <BUSID>`
    `usbipd attach --wsl --busid <BUSID>`
-6. En la consola de Ubuntu se introduce el comando:
+4. En la consola de Ubuntu se introduce el comando:
   `sudo picocom -b 115200 /dev/ttyACM0`
