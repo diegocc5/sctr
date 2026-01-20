@@ -17,16 +17,7 @@
 #include "pico/time.h"
 
 
-/* ------------------------------------------------------------
- * FUNCION BLINK LED
- * ------------------------------------------------------------ */
-struct repeating_timer timer;
-bool blink_callback(struct repeating_timer *t) {
-    static bool state = false;
-    gpio_put(LED_PIN, state);
-    state = !state;
-    return true;
-}
+
 
 
 /* ------------------------------------------------------------
@@ -43,7 +34,16 @@ bool blink_callback(struct repeating_timer *t) {
 /* Factor de conversión: 3.3V / 4095 (12 bits) */
 const float CONVERSION_FACTOR = 3.3f / (1 << 12);
 
-
+/* ------------------------------------------------------------
+ * FUNCION BLINK LED
+ * ------------------------------------------------------------ */
+struct repeating_timer timer;
+bool blink_callback(struct repeating_timer *t) {
+    static bool state = false;
+    gpio_put(LED_PIN, state);
+    state = !state;
+    return true;
+}
 /* ------------------------------------------------------------
  * MÁQUINA DE ESTADOS (LÓGICA)
  * ------------------------------------------------------------ */
