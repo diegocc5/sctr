@@ -126,7 +126,7 @@ enum state (*trans_table[STATE_MAX][EVENT_MAX])(void) = {
 /* El parser de eventos convierte el valor leído por el sensor de luz 
  * en eventos que la máquina de estados utiliza para decidir la acción 
  * sobre el LED. */
-enum event event_parser(float tension)
+enum event event_parser(float voltaje)
 {
     if (voltaje < 1.0f) {
         return OSCURO;
