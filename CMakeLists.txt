@@ -20,5 +20,5 @@ pico_enable_stdio_uart(sctr_app 0)
 # Enlazar las librerías necesarias (importante para el I2C del sensor)
 target_link_libraries(sctr_app pico_stdlib hardware_i2c)
 
-# Crear el archivo .uf2 que es el que cargará y ejecutará en la placa
+# Crear el archivo .uf2 que es el que cargará y ejecutará en la Raspberry Pi Pico
 pico_add_extra_outputs(sctr_app)
