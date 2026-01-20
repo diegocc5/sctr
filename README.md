@@ -20,3 +20,13 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 3. Configurar: `cmake ..`
 4. Compilar: `make`
 5. Arrastrar el archivo `.uf2` a la Raspberry Pi Pico.
+
+## Instrucciones de Conexión con la placa para lectura de datos del sensor LDR
+1. Ejecutar como administrador la consola Powershell de Windows.
+2. Conectar la placa con el programa ya guardado archivo `.uf2` SIN pulsar el botón.
+3. Introducir el comando `usbipd list` y anotar el <BUSID>
+4. Introducir los comandos:
+   `usbipd bind --busid <BUSID>
+    usbipd attach --wsl --busid <BUSID>`
+5. En la consola de Ubuntu se introduce el comando:
+  `sudo picocom -b 115200 /dev/ttyACM0`
