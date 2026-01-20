@@ -155,46 +155,30 @@ enum event {
     EVENT_MAX
 };
 
-/* Funciones para mostrar en consola el estado del led. */
-void oscuridad(void){
-    printf("LED: APAGADO.\n");
-}
-void poca_luz(void){
-    printf("LED: TENUE (PARPADEO).\n");
-}
-void luz(void){
-    printf("LED: ENCENDIDO.\n");
-}
 
 /* Funciones de tipo enum state para devolver un valor de estado. */
 enum state oscuro_pocaluz(void)
 {
-    poca_luz();
     return PARPADEO;
 }
 enum state oscuro_luz(void)
 {
-    luz();
     return ENCENDIDO;
 }
 enum state pocaluz_luz(void)
 {
-    luz();
     return ENCENDIDO;
 }
 enum state pocaluz_oscuro(void)
 {
-    oscuridad();
     return APAGADO;
 }
 enum state luz_pocaluz(void)
 {
-    poca_luz();
     return PARPADEO;
 }
 enum state luz_oscuro(void)
 {
-    oscuridad();
     return APAGADO;
 }
 
