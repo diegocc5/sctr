@@ -68,20 +68,17 @@ enum event {
 
 /* Funciones para el estado del led. */
 void oscuridad(void){
-    gpio_put(LED_PIN, 1); // encender LED físico
+    gpio_put(LED_PIN, 1); // Encender LED físico
     cancel_repeating_timer(&timer);
 }
-
 void poca_luz(void){
     add_repeating_timer_ms(500, blink_callback, NULL, &timer);
    
 }
-
 void luz(void){
-    gpio_put(LED_PIN, 0); // apagar LED físico
+    gpio_put(LED_PIN, 0); // Apagar LED físico
     cancel_repeating_timer(&timer);
 }
-
 void print_adc_voltage(float voltaje){
     printf("Voltaje LDR: %.2f V\n", voltaje);
 }
@@ -159,9 +156,12 @@ int main(void)
 {
     /* Inicializa los sistemas de entrada/salida estándar. */
     stdio_init_all();
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
 
+    /* Inicializa el LED. */
+    gpio_init(LED_PIN); // Selecciona el pin del LED
+    gpio_set_dir(LED_PIN, GPIO_OUT); // Configura el pin del LED como salida
+
+    /* Inicializa el convertidor ADC. */
     adc_init();
     adc_gpio_init(ADC_PIN); // Prepara el pin GP26 para leer analógico
     adc_select_input(ADC_CHANNEL); // Selecciona el canal 0
@@ -169,13 +169,14 @@ int main(void)
     /* Retardo para asegurar inicialización. */
     sleep_ms(100);
 
-    /*Estado inicial, LED apagado. */
+    /* Estado inicial, LED apagado. */
     oscuridad();
-    /* Corrección: El estado inicial de la variable debe coincidir con la lógica */
+    
+    /* Se iniciliza la varible estado st a 0 = Apagado. */
     enum state st = APAGADO; 
 
     /* Bucle for infinito para comprobar constantemente el estado del sensor de luminosidad
-     * y ejecutar los consiguientes cambios en el led. */
+     * y ejecutar los consiguientes cambios en el LED. */
     for (;;) {
 
         /* Leer el valor crudo del ADC (0-4095) */
@@ -184,13 +185,13 @@ int main(void)
          /* Convertir a Voltaje (0.0V - 3.3V) */
         float voltaje = raw_value * CONVERSION_FACTOR;
 
-        // Imprimir en consola
+        /* Imprimir en consola. */
         print_adc_voltage(voltaje);
 
         /* Convertir la entrada de valor de luminosidad en un evento de la FSM. */
         enum event ev = event_parser(voltaje);
 
-        /* Validación de evento nulo antes de buscar en tabla */
+        /* Validación de evento nulo antes de buscar en la tabla de transiciones. */
         if (ev == NONE) {
              sleep_ms(100);
              continue;
@@ -203,7 +204,7 @@ int main(void)
         enum state (*tr)(void) = trans_table[st][ev];
 
         if (tr == NULL) { 
-            /* Transición no válida, se mantiene estado */
+            /* Transición no válida, se mantiene estado. */
         } else {
              /* Se ejecuta la acción de transición y se actualiza el estado. */
             st = tr(); 
@@ -212,6 +213,5 @@ int main(void)
         /* Pequeño retardo para estabilidad */
         sleep_ms(500);
     }
-
     return 0;
 }
