@@ -40,17 +40,7 @@ bool blink_callback(struct repeating_timer *t) {
     state = !state;
     return true;
 }
-/* ------------------------------------------------------------
- * FUNCION SACAR NOMBRE DEL ENUMERANDO
- * ------------------------------------------------------------ */
-const char *state_to_str(enum state st) {
-    switch (st) {
-        case APAGADO:   return "APAGADO";
-        case PARPADEO:  return "PARPADEO";
-        case ENCENDIDO: return "ENCENDIDO";
-        default:        return "DESCONOCIDO";
-    }
-}
+
 
 /* ------------------------------------------------------------
  * MÁQUINA DE ESTADOS (LÓGICA)
@@ -158,7 +148,17 @@ enum event event_parser(float voltaje)
     }
     return NONE;
 }
-
+/* ------------------------------------------------------------
+ * FUNCION SACAR NOMBRE DEL ENUMERANDO
+ * ------------------------------------------------------------ */
+const char *state_to_str(enum state st) {
+    switch (st) {
+        case APAGADO:   return "APAGADO";
+        case PARPADEO:  return "PARPADEO";
+        case ENCENDIDO: return "ENCENDIDO";
+        default:        return "DESCONOCIDO";
+    }
+}
 /* ------------------------------------------------------------
  * FUNCIÓN PRINCIPAL
  * ------------------------------------------------------------ */
