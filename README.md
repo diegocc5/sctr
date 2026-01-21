@@ -31,4 +31,7 @@ Este proyecto implementa un sistema de control de iluminación automático basad
   `sudo picocom -b 115200 /dev/ttyACM0`
 
 ## Prueba en video del proyecto
-![Esquema del Circuito](video.mp4)
+
+https://github.com/user-attachments/assets/caecdab8-d33f-4822-bf49-d800c3051bf4
+
+
