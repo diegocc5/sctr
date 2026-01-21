@@ -93,17 +93,17 @@ enum state oscuro_pocaluz(void)
 enum state oscuro_luz(void)
 {
     luz();
-    return ENCENDIDO;
+    return APAGADO;
 }
 enum state pocaluz_luz(void)
 {
     luz();
-    return ENCENDIDO;
+    return APAGADO;
 }
 enum state pocaluz_oscuro(void)
 {
     oscuridad();
-    return APAGADO;
+    return ENCENDIDO;
 }
 enum state luz_pocaluz(void)
 {
@@ -113,7 +113,7 @@ enum state luz_pocaluz(void)
 enum state luz_oscuro(void)
 {
     oscuridad();
-    return APAGADO;
+    return ENCENDIDO;
 }
 
 /* Enum state para crear la Tabla de Transiciones que, a partir del estado actual 
