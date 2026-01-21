@@ -40,6 +40,17 @@ bool blink_callback(struct repeating_timer *t) {
     state = !state;
     return true;
 }
+/* ------------------------------------------------------------
+ * FUNCION SACAR NOMBRE DEL ENUMERANDO
+ * ------------------------------------------------------------ */
+const char *state_to_str(enum state st) {
+    switch (st) {
+        case APAGADO:   return "APAGADO";
+        case PARPADEO:  return "PARPADEO";
+        case ENCENDIDO: return "ENCENDIDO";
+        default:        return "DESCONOCIDO";
+    }
+}
 
 /* ------------------------------------------------------------
  * MÁQUINA DE ESTADOS (LÓGICA)
@@ -209,7 +220,7 @@ int main(void)
              /* Se ejecuta la acción de transición y se actualiza el estado. */
             st = tr(); 
         }
-
+        printf("Estado: %s\n", state_to_str(st));
         /* Pequeño retardo para estabilidad */
         sleep_ms(500);
     }
