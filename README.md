@@ -12,7 +12,7 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 ## Esquema del Circuito
 ![Esquema del Circuito](esquema.png)
 
-> El sistema conecta el sensor LDR (Pines GPIO-- y GPIO--).
+> El sistema conecta el sensor LDR (Pin GPIO--).
 
 ## Instrucciones de Compilación
 1. Clonar el repositorio.
@@ -29,6 +29,9 @@ Este proyecto implementa un sistema de control de iluminación automático basad
    `usbipd attach --wsl --busid <BUSID>`
 4. En la consola de Ubuntu se introduce el comando:
   `sudo picocom -b 115200 /dev/ttyACM0`
+
+## Modificación respecto a la propuesta inicial
+Inicialmente la medición de la tensión en el sensor LDR iba a realizarse mediante un sensor INA219, este estaría conectado a la Raspberry Pi Pico para la lectura de valores y posterior toma de decisiones. Pero tras considerarlo, se decidió eliminar este sensor para facilitar el proceso, y tomar los valores del sensor LDR directamente en la Raspberry Pi Pico a través de uno de sus puertos ADC.
 
 ## Prueba en video del proyecto
 
