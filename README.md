@@ -10,7 +10,7 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 * **Diego Costas Méndez:**
 
 ## Esquema del Circuito
-![Esquema del Circuito](esquema1.png)
+![Esquema del Circuito](esquema2.png)
 
 > El sistema conecta el sensor LDR (Pin GPIO--).
 
