@@ -6,7 +6,7 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 ## Autores y Roles
 * **Yago Andrés Martínez: desarrollo de hardware y software principal.** 
 * **Brais Ansede González: colaboración general.** 
-* **Andrea Caeiro Almeida: documentación software y compilación.** 
+* **Andrea Caeiro Almeida: documentación técnica y compilación.** 
 * **Diego Costas Méndez: gestión del repositorio y documentación inicial.**
 
 ## Esquema del Circuito
