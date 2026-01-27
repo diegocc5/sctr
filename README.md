@@ -13,9 +13,13 @@ Este proyecto implementa un sistema de control de iluminación automático basad
 ![Esquema del Circuito](esquema2.png)
 
 > Conexión Sensor LDR Pin 36 (Tensión 3.3V OUT).
+
 > Resistencia de 10 kΩ conectada en serie con el Sensor LDR.
+
 > Conexión ADC0 Pin 31 (GP26) a la salida del Sensor LDR.
+
 > Conexión LED Pin 4 (I2C1 SDA - GP2).
+
 
 ## Instrucciones de Compilación
 1. Clonar el repositorio.
