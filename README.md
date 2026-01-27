@@ -4,10 +4,10 @@
 Este proyecto implementa un sistema de control de iluminación automático basado en una Raspberry Pi Pico. El sistema utiliza una máquina de estados (FSM) basada en tablas ("Table-Driven") para gestionar las transiciones entre estados (Apagado, Parpadeo, Encendido) en función del voltaje medido por el sensor LDR.
 
 ## Autores y Roles
-* **Yago Andrés Martínez:** 
-* **Brais Ansede González:** 
-* **Andrea Caeiro Almeida:** 
-* **Diego Costas Méndez:**
+* **Yago Andrés Martínez: desarrollo de hardware y software principal.** 
+* **Brais Ansede González: colaboración general.** 
+* **Andrea Caeiro Almeida: documentación software y compilación.** 
+* **Diego Costas Méndez: gestión del repositorio y documentación inicial.**
 
 ## Esquema del Circuito
 ![Esquema del Circuito](esquema2.png)
